@@ -25,7 +25,7 @@ import org.apache.flink.connectors.hive.FlinkHiveException;
 import org.apache.flink.connectors.hive.HiveDynamicTableFactory;
 import org.apache.flink.connectors.hive.HiveTableFactory;
 import org.apache.flink.connectors.hive.util.HivePartitionUtils;
-import org.apache.flink.table.api.constraints.UniqueConstraint;
+import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.catalog.AbstractCatalog;
 import org.apache.flink.table.catalog.CatalogBaseTable;
 import org.apache.flink.table.catalog.CatalogDatabase;
@@ -39,7 +39,6 @@ import org.apache.flink.table.catalog.CatalogPropertiesUtil;
 import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.catalog.CatalogView;
 import org.apache.flink.table.catalog.FunctionLanguage;
-import org.apache.flink.table.catalog.ManagedTableListener;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.ResolvedCatalogBaseTable;
 import org.apache.flink.table.catalog.ResolvedCatalogTable;
@@ -75,8 +74,7 @@ import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.factories.Factory;
 import org.apache.flink.table.factories.FunctionDefinitionFactory;
-import org.apache.flink.table.factories.ManagedTableFactory;
-import org.apache.flink.table.factories.TableFactory;
+import org.apache.flink.table.legacy.factories.TableFactory;
 import org.apache.flink.table.resource.ResourceUri;
 import org.apache.flink.util.Preconditions;
 
@@ -327,11 +325,6 @@ public class HiveCatalog extends AbstractCatalog {
     }
 
     @Override
-    public Optional<TableFactory> getTableFactory() {
-        return Optional.of(new HiveTableFactory());
-    }
-
-    @Override
     public Optional<FunctionDefinitionFactory> getFunctionDefinitionFactory() {
         return Optional.of(new HiveFunctionDefinitionFactory(hiveShim));
     }
@@ -480,10 +473,10 @@ public class HiveCatalog extends AbstractCatalog {
             throw new DatabaseNotExistException(getName(), tablePath.getDatabaseName());
         }
 
-        boolean managedTable = ManagedTableListener.isManagedTable(this, resolvedTable);
+        // boolean managedTable = ManagedTableListener.isManagedTable(this, resolvedTable);
         Table hiveTable =
                 HiveTableUtil.instantiateHiveTable(
-                        tablePath, resolvedTable, hiveConf, managedTable);
+                        tablePath, resolvedTable, hiveConf);
 
         UniqueConstraint pkConstraint = null;
         ResolvedSchema resolvedSchema = resolvedTable.getResolvedSchema();
@@ -619,8 +612,7 @@ public class HiveCatalog extends AbstractCatalog {
                                 tablePath,
                                 (ResolvedCatalogBaseTable) newCatalogTable,
                                 hiveTable,
-                                hiveConf,
-                                false);
+                                hiveConf);
             } else {
                 alterTableViaProperties(
                         op,
@@ -636,8 +628,7 @@ public class HiveCatalog extends AbstractCatalog {
                             tablePath,
                             (ResolvedCatalogBaseTable) newCatalogTable,
                             hiveTable,
-                            hiveConf,
-                            ManagedTableListener.isManagedTable(this, newCatalogTable));
+                            hiveConf);
         }
         if (isHiveTable) {
             hiveTable.getParameters().remove(CONNECTOR.key());
@@ -767,12 +758,6 @@ public class HiveCatalog extends AbstractCatalog {
         } else {
             properties = retrieveFlinkProperties(properties);
 
-            if (ManagedTableFactory.DEFAULT_IDENTIFIER.equalsIgnoreCase(
-                    properties.get(CONNECTOR.key()))) {
-                // for Flink's managed table, we remove the connector option
-                properties.remove(CONNECTOR.key());
-            }
-
             CatalogTable catalogTable = CatalogPropertiesUtil.deserializeCatalogTable(properties);
             if (catalogTable.getUnresolvedSchema().getColumns().isEmpty()) {
                 // try to get table schema with both new and old (1.10) key, in order to support
@@ -796,7 +781,12 @@ public class HiveCatalog extends AbstractCatalog {
                     hiveTable.getViewExpandedText(),
                     properties);
         } else {
-            return CatalogTable.of(schema, comment, partitionKeys, properties);
+            return CatalogTable.newBuilder()
+                    .schema(schema)
+                    .comment(comment)
+                    .partitionKeys(partitionKeys)
+                    .options(properties)
+                    .build();
         }
     }
 
@@ -1813,11 +1803,6 @@ public class HiveCatalog extends AbstractCatalog {
         }
 
         return result;
-    }
-
-    @Override
-    public boolean supportsManagedTable() {
-        return true;
     }
 
     @Internal
