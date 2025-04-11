@@ -22,7 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.connectors.hive.FlinkHiveException;
 import org.apache.flink.table.api.DataTypes;
-import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.catalog.CatalogPropertiesUtil;
 import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.catalog.CatalogView;
@@ -45,6 +44,7 @@ import org.apache.flink.table.expressions.ValueLiteralExpression;
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions;
 import org.apache.flink.table.functions.FunctionDefinition;
 import org.apache.flink.table.functions.hive.conversion.HiveInspectors;
+import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.LogicalTypeFamily;
 import org.apache.flink.table.types.logical.LogicalTypeRoot;
@@ -474,9 +474,7 @@ public class HiveTableUtil {
     }
 
     public static Table instantiateHiveTable(
-            ObjectPath tablePath,
-            ResolvedCatalogBaseTable table,
-            HiveConf hiveConf) {
+            ObjectPath tablePath, ResolvedCatalogBaseTable table, HiveConf hiveConf) {
         final boolean isView = table instanceof CatalogView;
         // let Hive set default parameters for us, e.g. serialization.format
         Table hiveTable =
