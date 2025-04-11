@@ -85,7 +85,7 @@ under the License.
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-sql-connector-hive-4.0.0_${scala.binary.version}</artifactId>
-			<version>${flink.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- hadoop dependencies for end-to-end test -->
