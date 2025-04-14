@@ -440,7 +440,8 @@ public class HiveParserDMLHelper {
                         .schema(schema)
                         .comment("a dummy table for the case of insert overwrite directory ")
                         .partitionKeys(Collections.emptyList())
-                        .options(props).build();
+                        .options(props)
+                        .build();
         ResolvedCatalogTable resolvedCatalogTable =
                 new ResolvedCatalogTable(catalogTable, resolvedSchema);
         String currentCatalog = catalogRegistry.getCurrentCatalog();

@@ -663,7 +663,10 @@ public class HiveParserSemanticAnalyzer {
             ResolvedCatalogTable tempTable =
                     new ResolvedCatalogTable(
                             CatalogTable.newBuilder()
-                                    .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                    .schema(
+                                            Schema.newBuilder()
+                                                    .fromResolvedSchema(resolvedSchema)
+                                                    .build())
                                     .comment("values temp table")
                                     .partitionKeys(new ArrayList<>())
                                     .options(Collections.emptyMap())

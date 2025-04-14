@@ -22,7 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.ValidationException;
-import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.calcite.bridge.CalciteContext;
 import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.CatalogBaseTable;
@@ -61,6 +60,7 @@ import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.flink.table.functions.FunctionDefinition;
 import org.apache.flink.table.functions.hive.HiveFunctionWrapper;
 import org.apache.flink.table.functions.hive.HiveGenericUDF;
+import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.operations.CreateTableASOperation;
 import org.apache.flink.table.operations.DescribeTableOperation;
 import org.apache.flink.table.operations.Operation;
@@ -1067,12 +1067,14 @@ public class HiveParserDDLSemanticAnalyzer {
                 ResolvedCatalogTable destTable =
                         new ResolvedCatalogTable(
                                 CatalogTable.newBuilder()
-                                        .schema(Schema.newBuilder().fromResolvedSchema(schema).build())
+                                        .schema(
+                                                Schema.newBuilder()
+                                                        .fromResolvedSchema(schema)
+                                                        .build())
                                         .comment(comment)
                                         .partitionKeys(HiveCatalog.getFieldNames(partCols))
                                         .options(tblProps)
-                                        .build()
-                                ,
+                                        .build(),
                                 schema);
 
                 Tuple4<ObjectIdentifier, QueryOperation, Map<String, String>, Boolean>
@@ -1196,18 +1198,18 @@ public class HiveParserDDLSemanticAnalyzer {
             notNullColSet.addAll(uniqueConstraint.getColumns());
         }
         Schema schema = HiveTableUtil.createSchema(cols, partCols, notNullColSet, uniqueConstraint);
-        ResolvedSchema resolvedSchema = HiveTableUtil.createResolvedSchema(cols, partCols, notNullColSet, uniqueConstraint);
+        ResolvedSchema resolvedSchema =
+                HiveTableUtil.createResolvedSchema(cols, partCols, notNullColSet, uniqueConstraint);
         return new CreateTableOperation(
                 identifier,
-                    new ResolvedCatalogTable(
-                    CatalogTable
-                        .newBuilder()
-                        .schema(schema)
-                        .comment(comment)
-                        .partitionKeys(HiveCatalog.getFieldNames(partCols))
-                        .options(props)
-                        .build(), resolvedSchema
-                    ),
+                new ResolvedCatalogTable(
+                        CatalogTable.newBuilder()
+                                .schema(schema)
+                                .comment(comment)
+                                .partitionKeys(HiveCatalog.getFieldNames(partCols))
+                                .options(props)
+                                .build(),
+                        resolvedSchema),
                 ifNotExists,
                 isTemporary);
     }
@@ -1855,11 +1857,11 @@ public class HiveParserDDLSemanticAnalyzer {
         if (pattern != null) {
             handleUnsupportedOperation("SHOW TABLES/VIEWS LIKE is not supported");
         }
-        return expectView ? new ShowViewsOperation(
-                catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase()
-        ) : new ShowTablesOperation(
-                catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase()
-        );
+        return expectView
+                ? new ShowViewsOperation(
+                        catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase())
+                : new ShowTablesOperation(
+                        catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase());
     }
 
     /**
@@ -1873,7 +1875,8 @@ public class HiveParserDDLSemanticAnalyzer {
             assert (ast.getChild(0).getType() == HiveASTParser.KW_LIKE);
             throw new ValidationException("SHOW FUNCTIONS LIKE is not supported yet");
         }
-        return new ShowFunctionsOperation(catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase());
+        return new ShowFunctionsOperation(
+                catalogRegistry.getCurrentCatalog(), catalogRegistry.getCurrentDatabase());
     }
 
     private Operation convertAlterTableRename(
@@ -1998,7 +2001,8 @@ public class HiveParserDDLSemanticAnalyzer {
                                 .schema(Schema.newBuilder().fromResolvedSchema(newSchema).build())
                                 .comment(oldTable.getComment())
                                 .partitionKeys(oldTable.getPartitionKeys())
-                                .options(props).build(),
+                                .options(props)
+                                .build(),
                         newSchema),
                 false);
     }

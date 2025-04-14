@@ -39,7 +39,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -80,7 +79,10 @@ public class HiveSourceITCase {
                 tablePath,
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema (Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .options(tableOptions)
                                 .build(),
                         resolvedSchema),
@@ -126,9 +128,12 @@ public class HiveSourceITCase {
                 tablePath,
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                    .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
-                                    .partitionKeys(Collections.singletonList("p"))
-                                    .options(tableOptions)
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
+                                .partitionKeys(Collections.singletonList("p"))
+                                .options(tableOptions)
                                 .build(),
                         resolvedSchema),
                 false);
