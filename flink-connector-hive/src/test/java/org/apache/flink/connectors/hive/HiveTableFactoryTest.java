@@ -85,7 +85,11 @@ class HiveTableFactoryTest {
                 Collections.singletonMap(FactoryUtil.CONNECTOR.key(), "COLLECTION");
         final CatalogTable table =
                 new ResolvedCatalogTable(
-                        CatalogTable.newBuilder().schema(schema).comment("csv table").options(options).build(),
+                        CatalogTable.newBuilder()
+                                .schema(schema)
+                                .comment("csv table")
+                                .options(options)
+                                .build(),
                         resolvedSchema);
         catalog.createTable(new ObjectPath("mydb", "mytable"), table, true);
 
@@ -125,8 +129,7 @@ class HiveTableFactoryTest {
         final CatalogTable table =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder()
-                                .fromResolvedSchema(schema).build())
+                                .schema(Schema.newBuilder().fromResolvedSchema(schema).build())
                                 .comment("hive table")
                                 .options(options)
                                 .build(),

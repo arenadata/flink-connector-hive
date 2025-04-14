@@ -167,7 +167,10 @@ public class HiveCatalogITCase {
         CatalogTable source =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .comment("Comment.")
                                 .options(sourceOptions)
                                 .build(),
@@ -183,7 +186,10 @@ public class HiveCatalogITCase {
         CatalogTable sink =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .comment("Comment.")
                                 .options(sinkOptions)
                                 .build(),

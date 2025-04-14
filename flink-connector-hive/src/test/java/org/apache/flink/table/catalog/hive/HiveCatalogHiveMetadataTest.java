@@ -186,7 +186,10 @@ class HiveCatalogHiveMetadataTest extends HiveCatalogMetadataTestBase {
         CatalogTable catalogTable =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .comment(TEST_COMMENT)
                                 .options(getBatchTableProperties())
                                 .build(),
@@ -275,7 +278,10 @@ class HiveCatalogHiveMetadataTest extends HiveCatalogMetadataTestBase {
                 path1,
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .options(getBatchTableProperties())
                                 .build(),
                         resolvedSchema),
@@ -339,7 +345,10 @@ class HiveCatalogHiveMetadataTest extends HiveCatalogMetadataTestBase {
         CatalogTable resolveCatalogTable =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .comment("")
                                 .options(properties)
                                 .build(),

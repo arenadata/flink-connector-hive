@@ -385,7 +385,10 @@ class HiveCatalogGenericMetadataTest extends HiveCatalogMetadataTestBase {
         CatalogTable catalogTable =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .build(),
                         resolvedSchema);
         catalog.createTable(path1, catalogTable, false);

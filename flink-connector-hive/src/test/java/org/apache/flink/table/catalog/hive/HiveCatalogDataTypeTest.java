@@ -208,12 +208,13 @@ public class HiveCatalogDataTypeTest {
                 CatalogTable.newBuilder()
                         .schema(schema)
                         .comment("")
-                        .options(new HashMap<String, String>() {
-                            {
-                                put("is_streaming", "false");
-                                put(FactoryUtil.CONNECTOR.key(), IDENTIFIER);
-                            }
-                        })
+                        .options(
+                                new HashMap<String, String>() {
+                                    {
+                                        put("is_streaming", "false");
+                                        put(FactoryUtil.CONNECTOR.key(), IDENTIFIER);
+                                    }
+                                })
                         .build(),
                 resolvedSchema);
     }

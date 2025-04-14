@@ -226,10 +226,9 @@ class HiveSourceTest {
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
                                 .schema(
-                                    Schema.newBuilder()
-                                        .fromResolvedSchema(partitionTableRSchema)
-                                        .build()
-                                )
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(partitionTableRSchema)
+                                                .build())
                                 .partitionKeys(isPartitioned ? keys : Collections.emptyList())
                                 .options(tableOptions)
                                 .build(),

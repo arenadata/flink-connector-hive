@@ -85,7 +85,10 @@ public class HiveDeserializeExceptionTest {
         ResolvedCatalogTable resolvedCatalogTable =
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
-                                .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
+                                .schema(
+                                        Schema.newBuilder()
+                                                .fromResolvedSchema(resolvedSchema)
+                                                .build())
                                 .build(),
                         resolvedSchema);
         HiveSourceBuilder builder =

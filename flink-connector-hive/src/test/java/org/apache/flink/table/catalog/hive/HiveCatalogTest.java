@@ -91,11 +91,9 @@ public class HiveCatalogTest {
                                 CatalogTable.newBuilder()
                                         .schema(schema)
                                         .options(getLegacyFileSystemConnectorOptions("/test_path"))
-                                        .build()
-                                        ,
+                                        .build(),
                                 resolvedSchema),
-                        HiveTestUtils.createHiveConf()
-                        );
+                        HiveTestUtils.createHiveConf());
 
         Map<String, String> prop = hiveTable.getParameters();
         assertThat(HiveCatalog.isHiveTable(prop)).isFalse();
@@ -112,13 +110,9 @@ public class HiveCatalogTest {
                 HiveTableUtil.instantiateHiveTable(
                         new ObjectPath("test", "test"),
                         new ResolvedCatalogTable(
-                                CatalogTable.newBuilder()
-                                                .schema(schema)
-                                                .options(options)
-                                                .build(),
+                                CatalogTable.newBuilder().schema(schema).options(options).build(),
                                 resolvedSchema),
-                        HiveTestUtils.createHiveConf()
-                );
+                        HiveTestUtils.createHiveConf());
 
         Map<String, String> prop = hiveTable.getParameters();
         assertThat(HiveCatalog.isHiveTable(prop)).isTrue();
@@ -179,8 +173,8 @@ public class HiveCatalogTest {
                 new ResolvedCatalogTable(
                         CatalogTable.newBuilder()
                                 .schema(Schema.newBuilder().build())
-                                    .options(properties)
-                                    .build(),
+                                .options(properties)
+                                .build(),
                         ResolvedSchema.of()),
                 false);
 

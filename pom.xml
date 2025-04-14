@@ -74,6 +74,8 @@ under the License.
         <flink.markBundledAsOptional>true</flink.markBundledAsOptional>
 
         <flink.parent.artifactId>flink-connector-hive-parent</flink.parent.artifactId>
+        <source.java.version>17</source.java.version>
+        <target.java.version>17</target.java.version>
     </properties>
 
     <dependencyManagement>
@@ -431,6 +433,14 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${source.java.version}</source>
+                    <target>${target.java.version}</target>
+                    <compilerArgs combine.children="append">
+                        <arg>--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -446,6 +456,7 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
             </plugin>
 
             <plugin>
