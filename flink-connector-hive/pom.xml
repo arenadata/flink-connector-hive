@@ -1502,7 +1502,7 @@ under the License.
 									<include>org.apache.flink:flink-hadoop-fs</include>
 									<include>org.apache.flink:flink-orc</include>
 									<include>org.apache.flink:flink-orc-nohive</include>
-									<include>org.apache.flink:flink-hadoop-compatibility_${scala.binary.version}</include>
+									<include>org.apache.flink:flink-hadoop-compatibility</include>
 									<include>org.apache.flink:flink-parquet</include>
 									<include>org.apache.flink:flink-hadoop-bulk</include>
 									<include>org.apache.parquet:parquet-hadoop</include>
