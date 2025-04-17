@@ -1500,8 +1500,6 @@ under the License.
 							<artifactSet>
 								<includes combine.children="append">
 									<include>org.apache.flink:flink-hadoop-fs</include>
-									<include>org.apache.flink:flink-orc</include>
-									<include>org.apache.flink:flink-orc-nohive</include>
 									<include>org.apache.flink:flink-hadoop-compatibility</include>
 									<include>org.apache.flink:flink-parquet</include>
 									<include>org.apache.flink:flink-hadoop-bulk</include>
