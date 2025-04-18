@@ -52,8 +52,8 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.functions.sink.filesystem.HadoopPathBasedBulkFormatBuilder;
 import org.apache.flink.streaming.api.functions.sink.filesystem.OutputFileConfig;
 import org.apache.flink.streaming.api.functions.sink.filesystem.PartFileInfo;
-import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink;
-import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink.BucketsBuilder;
+import org.apache.flink.streaming.api.functions.sink.filesystem.legacy.StreamingFileSink;
+import org.apache.flink.streaming.api.functions.sink.filesystem.legacy.StreamingFileSink.BucketsBuilder;
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.CheckpointRollingPolicy;
 import org.apache.flink.table.api.ValidationException;
 import org.apache.flink.table.catalog.CatalogPropertiesUtil;
@@ -280,7 +280,7 @@ public class HiveTableSink implements DynamicTableSink, SupportsPartitioning, Su
             Class hiveOutputFormatClz =
                     hiveShim.getHiveOutputFormatClass(Class.forName(sd.getOutputFormat()));
             boolean isCompressed =
-                    jobConf.getBoolean(HiveConf.ConfVars.COMPRESSRESULT.varname, false);
+                    jobConf.getBoolean(HiveConf.ConfVars.COMPRESS_RESULT.varname, false);
             HiveWriterFactory writerFactory =
                     new HiveWriterFactory(
                             jobConf,
@@ -323,7 +323,7 @@ public class HiveTableSink implements DynamicTableSink, SupportsPartitioning, Su
                             new Path(
                                     HiveConf.getVar(
                                             HiveConfUtils.create(jobConf),
-                                            HiveConf.ConfVars.SCRATCHDIR));
+                                            HiveConf.ConfVars.SCRATCH_DIR));
                     // TODO: may append something more meaningful than a timestamp, like query ID
                     Path scratchDir =
                             new Path(

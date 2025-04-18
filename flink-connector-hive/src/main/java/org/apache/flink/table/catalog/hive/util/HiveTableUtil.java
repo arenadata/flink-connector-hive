@@ -22,7 +22,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.connectors.hive.FlinkHiveException;
 import org.apache.flink.table.api.DataTypes;
-import org.apache.flink.table.api.constraints.UniqueConstraint;
 import org.apache.flink.table.catalog.CatalogPropertiesUtil;
 import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.catalog.CatalogView;
@@ -42,10 +41,10 @@ import org.apache.flink.table.expressions.ExpressionVisitor;
 import org.apache.flink.table.expressions.FieldReferenceExpression;
 import org.apache.flink.table.expressions.TypeLiteralExpression;
 import org.apache.flink.table.expressions.ValueLiteralExpression;
-import org.apache.flink.table.factories.ManagedTableFactory;
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions;
 import org.apache.flink.table.functions.FunctionDefinition;
 import org.apache.flink.table.functions.hive.conversion.HiveInspectors;
+import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.LogicalTypeFamily;
 import org.apache.flink.table.types.logical.LogicalTypeRoot;
@@ -422,7 +421,7 @@ public class HiveTableUtil {
         sd.setOutputFormat(storageFormatDescriptor.getOutputFormat());
         String serdeLib = storageFormatDescriptor.getSerde();
         if (serdeLib == null && storageFormatDescriptor instanceof RCFileStorageFormatDescriptor) {
-            serdeLib = hiveConf.getVar(HiveConf.ConfVars.HIVEDEFAULTRCFILESERDE);
+            serdeLib = hiveConf.getVar(HiveConf.ConfVars.HIVE_DEFAULT_RCFILE_SERDE);
         }
         if (serdeLib != null) {
             sd.getSerdeInfo().setSerializationLib(serdeLib);
@@ -430,8 +429,9 @@ public class HiveTableUtil {
     }
 
     public static void setDefaultStorageFormat(StorageDescriptor sd, HiveConf hiveConf) {
-        sd.getSerdeInfo().setSerializationLib(hiveConf.getVar(HiveConf.ConfVars.HIVEDEFAULTSERDE));
-        setStorageFormat(sd, hiveConf.getVar(HiveConf.ConfVars.HIVEDEFAULTFILEFORMAT), hiveConf);
+        sd.getSerdeInfo()
+                .setSerializationLib(hiveConf.getVar(HiveConf.ConfVars.HIVE_DEFAULT_SERDE));
+        setStorageFormat(sd, hiveConf.getVar(HiveConf.ConfVars.HIVE_DEFAULT_FILEFORMAT), hiveConf);
     }
 
     public static void setDefaultStorageFormatForDirectory(
@@ -463,9 +463,8 @@ public class HiveTableUtil {
             ObjectPath tablePath,
             ResolvedCatalogBaseTable baseTable,
             Table oldHiveTable,
-            HiveConf hiveConf,
-            boolean managedTable) {
-        Table newHiveTable = instantiateHiveTable(tablePath, baseTable, hiveConf, managedTable);
+            HiveConf hiveConf) {
+        Table newHiveTable = instantiateHiveTable(tablePath, baseTable, hiveConf);
         // client.alter_table() requires a valid location
         // thus, if new table doesn't have that, it reuses location of the old table
         if (!newHiveTable.getSd().isSetLocation()) {
@@ -475,10 +474,7 @@ public class HiveTableUtil {
     }
 
     public static Table instantiateHiveTable(
-            ObjectPath tablePath,
-            ResolvedCatalogBaseTable table,
-            HiveConf hiveConf,
-            boolean managedTable) {
+            ObjectPath tablePath, ResolvedCatalogBaseTable table, HiveConf hiveConf) {
         final boolean isView = table instanceof CatalogView;
         // let Hive set default parameters for us, e.g. serialization.format
         Table hiveTable =
@@ -487,9 +483,6 @@ public class HiveTableUtil {
         hiveTable.setCreateTime((int) (System.currentTimeMillis() / 1000));
 
         Map<String, String> properties = new HashMap<>(table.getOptions());
-        if (managedTable) {
-            properties.put(CONNECTOR.key(), ManagedTableFactory.DEFAULT_IDENTIFIER);
-        }
         // Table comment
         if (table.getComment() != null) {
             properties.put(HiveCatalogConfig.COMMENT, table.getComment());

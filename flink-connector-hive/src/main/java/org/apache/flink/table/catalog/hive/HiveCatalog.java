@@ -23,9 +23,7 @@ import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.api.java.hadoop.mapred.utils.HadoopUtils;
 import org.apache.flink.connectors.hive.FlinkHiveException;
 import org.apache.flink.connectors.hive.HiveDynamicTableFactory;
-import org.apache.flink.connectors.hive.HiveTableFactory;
 import org.apache.flink.connectors.hive.util.HivePartitionUtils;
-import org.apache.flink.table.api.constraints.UniqueConstraint;
 import org.apache.flink.table.catalog.AbstractCatalog;
 import org.apache.flink.table.catalog.CatalogBaseTable;
 import org.apache.flink.table.catalog.CatalogDatabase;
@@ -39,7 +37,6 @@ import org.apache.flink.table.catalog.CatalogPropertiesUtil;
 import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.catalog.CatalogView;
 import org.apache.flink.table.catalog.FunctionLanguage;
-import org.apache.flink.table.catalog.ManagedTableListener;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.ResolvedCatalogBaseTable;
 import org.apache.flink.table.catalog.ResolvedCatalogTable;
@@ -75,8 +72,7 @@ import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.factories.Factory;
 import org.apache.flink.table.factories.FunctionDefinitionFactory;
-import org.apache.flink.table.factories.ManagedTableFactory;
-import org.apache.flink.table.factories.TableFactory;
+import org.apache.flink.table.legacy.api.constraints.UniqueConstraint;
 import org.apache.flink.table.resource.ResourceUri;
 import org.apache.flink.util.Preconditions;
 
@@ -213,7 +209,7 @@ public class HiveCatalog extends AbstractCatalog {
             checkArgument(
                     !isEmbeddedMetastore(this.hiveConf),
                     "Embedded metastore is not allowed. Make sure you have set a valid value for "
-                            + HiveConf.ConfVars.METASTOREURIS.toString());
+                            + HiveConf.ConfVars.METASTORE_URIS.toString());
         }
         checkArgument(!isNullOrWhitespaceOnly(hiveVersion), "hiveVersion cannot be null or empty");
         this.hiveVersion = hiveVersion;
@@ -324,11 +320,6 @@ public class HiveCatalog extends AbstractCatalog {
     @Override
     public Optional<Factory> getFactory() {
         return Optional.of(new HiveDynamicTableFactory(hiveConf));
-    }
-
-    @Override
-    public Optional<TableFactory> getTableFactory() {
-        return Optional.of(new HiveTableFactory());
     }
 
     @Override
@@ -480,10 +471,8 @@ public class HiveCatalog extends AbstractCatalog {
             throw new DatabaseNotExistException(getName(), tablePath.getDatabaseName());
         }
 
-        boolean managedTable = ManagedTableListener.isManagedTable(this, resolvedTable);
-        Table hiveTable =
-                HiveTableUtil.instantiateHiveTable(
-                        tablePath, resolvedTable, hiveConf, managedTable);
+        // boolean managedTable = ManagedTableListener.isManagedTable(this, resolvedTable);
+        Table hiveTable = HiveTableUtil.instantiateHiveTable(tablePath, resolvedTable, hiveConf);
 
         UniqueConstraint pkConstraint = null;
         ResolvedSchema resolvedSchema = resolvedTable.getResolvedSchema();
@@ -619,8 +608,7 @@ public class HiveCatalog extends AbstractCatalog {
                                 tablePath,
                                 (ResolvedCatalogBaseTable) newCatalogTable,
                                 hiveTable,
-                                hiveConf,
-                                false);
+                                hiveConf);
             } else {
                 alterTableViaProperties(
                         op,
@@ -636,8 +624,7 @@ public class HiveCatalog extends AbstractCatalog {
                             tablePath,
                             (ResolvedCatalogBaseTable) newCatalogTable,
                             hiveTable,
-                            hiveConf,
-                            ManagedTableListener.isManagedTable(this, newCatalogTable));
+                            hiveConf);
         }
         if (isHiveTable) {
             hiveTable.getParameters().remove(CONNECTOR.key());
@@ -767,12 +754,6 @@ public class HiveCatalog extends AbstractCatalog {
         } else {
             properties = retrieveFlinkProperties(properties);
 
-            if (ManagedTableFactory.DEFAULT_IDENTIFIER.equalsIgnoreCase(
-                    properties.get(CONNECTOR.key()))) {
-                // for Flink's managed table, we remove the connector option
-                properties.remove(CONNECTOR.key());
-            }
-
             CatalogTable catalogTable = CatalogPropertiesUtil.deserializeCatalogTable(properties);
             if (catalogTable.getUnresolvedSchema().getColumns().isEmpty()) {
                 // try to get table schema with both new and old (1.10) key, in order to support
@@ -796,7 +777,12 @@ public class HiveCatalog extends AbstractCatalog {
                     hiveTable.getViewExpandedText(),
                     properties);
         } else {
-            return CatalogTable.of(schema, comment, partitionKeys, properties);
+            return CatalogTable.newBuilder()
+                    .schema(schema)
+                    .comment(comment)
+                    .partitionKeys(partitionKeys)
+                    .options(properties)
+                    .build();
         }
     }
 
@@ -918,7 +904,7 @@ public class HiveCatalog extends AbstractCatalog {
                                             getHiveConf()
                                                     .getVar(
                                                             HiveConf.ConfVars
-                                                                    .DEFAULTPARTITIONNAME)))
+                                                                    .DEFAULT_PARTITION_NAME)))
                     .collect(Collectors.toList());
         } catch (TException e) {
             throw new CatalogException(
@@ -961,7 +947,7 @@ public class HiveCatalog extends AbstractCatalog {
                                             getHiveConf()
                                                     .getVar(
                                                             HiveConf.ConfVars
-                                                                    .DEFAULTPARTITIONNAME)))
+                                                                    .DEFAULT_PARTITION_NAME)))
                     .collect(Collectors.toList());
         } catch (TException e) {
             throw new CatalogException(
@@ -1180,7 +1166,7 @@ public class HiveCatalog extends AbstractCatalog {
             } else {
                 String value = spec.get(key);
                 if (value == null) {
-                    value = getHiveConf().getVar(HiveConf.ConfVars.DEFAULTPARTITIONNAME);
+                    value = getHiveConf().getVar(HiveConf.ConfVars.DEFAULT_PARTITION_NAME);
                 }
                 values.add(value);
             }
@@ -1603,7 +1589,7 @@ public class HiveCatalog extends AbstractCatalog {
         List<String> partitionCols = getFieldNames(hiveTable.getPartitionKeys());
         List<String> partitionVals =
                 getOrderedFullPartitionValues(partitionSpec, partitionCols, tablePath);
-        String defaultPartName = getHiveConf().getVar(HiveConf.ConfVars.DEFAULTPARTITIONNAME);
+        String defaultPartName = getHiveConf().getVar(HiveConf.ConfVars.DEFAULT_PARTITION_NAME);
         return FileUtils.makePartName(partitionCols, partitionVals, defaultPartName);
     }
 
@@ -1699,7 +1685,7 @@ public class HiveCatalog extends AbstractCatalog {
                     FileUtils.makePartName(
                             getFieldNames(hiveTable.getPartitionKeys()),
                             partition.getValues(),
-                            getHiveConf().getVar(HiveConf.ConfVars.DEFAULTPARTITIONNAME)),
+                            getHiveConf().getVar(HiveConf.ConfVars.DEFAULT_PARTITION_NAME)),
                     partition);
         }
         List<Partition> orderedPartitions = new ArrayList<>(partitions.size());
@@ -1787,7 +1773,7 @@ public class HiveCatalog extends AbstractCatalog {
                                 hiveTable,
                                 partitionName,
                                 hiveTable.getPartitionKeys(),
-                                getHiveConf().getVar(HiveConf.ConfVars.DEFAULTPARTITIONNAME));
+                                getHiveConf().getVar(HiveConf.ConfVars.DEFAULT_PARTITION_NAME));
 
                 // get statistic for non-partition columns
                 Map<String, CatalogColumnStatisticsDataBase> nonPartitionColumnStatistics =
@@ -1813,11 +1799,6 @@ public class HiveCatalog extends AbstractCatalog {
         }
 
         return result;
-    }
-
-    @Override
-    public boolean supportsManagedTable() {
-        return true;
     }
 
     @Internal
@@ -1958,7 +1939,7 @@ public class HiveCatalog extends AbstractCatalog {
 
     @Internal
     public static boolean isEmbeddedMetastore(HiveConf hiveConf) {
-        return isNullOrWhitespaceOnly(hiveConf.getVar(HiveConf.ConfVars.METASTOREURIS));
+        return isNullOrWhitespaceOnly(hiveConf.getVar(HiveConf.ConfVars.METASTORE_URIS));
     }
 
     private static Database alterDatabase(Database hiveDB, CatalogDatabase newDatabase) {

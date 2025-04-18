@@ -94,7 +94,7 @@ import com.google.common.collect.Lists;
  *
  * This is copied from hive to port https://issues.apache.org/jira/browse/HIVE-21508
  */
-@InterfaceAudience.Public
+// @InterfaceAudience.Public
 @InterfaceStability.Evolving
 public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   /**
