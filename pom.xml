@@ -82,6 +82,17 @@ under the License.
 
         <dependencies>
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.19.4</version>
+            </dependency>
+
+            <dependency>
                 <!-- Bump arrow netty dependency -->
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
@@ -438,6 +449,9 @@ under the License.
                     <source>${source.java.version}</source>
                     <target>${target.java.version}</target>
                     <compilerArgs combine.children="append">
+                        <arg>--add-exports=java.base/sun.net.util=ALL-UNNAMED</arg>
+                        <arg>--add-exports=java.management/sun.management=ALL-UNNAMED</arg>
+                        <arg>--add-exports=java.rmi/sun.rmi.registry=ALL-UNNAMED</arg>
                         <arg>--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED</arg>
                     </compilerArgs>
                 </configuration>
@@ -446,6 +460,23 @@ under the License.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <!--execute all the unit tests-->
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>
+                                --add-opens java.base/java.lang=ALL-UNNAMED
+                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens java.base/java.net=ALL-UNNAMED
+                            </argLine>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

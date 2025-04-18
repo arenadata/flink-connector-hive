@@ -625,6 +625,7 @@ class HiveCatalogHiveMetadataTest extends HiveCatalogMetadataTestBase {
                 CatalogTable.newBuilder()
                         .schema(Schema.newBuilder().fromResolvedSchema(resolvedSchema).build())
                         .comment(TEST_COMMENT)
+                        .partitionKeys(createPartitionKeys())
                         .options(getBatchTableProperties())
                         .build();
         CatalogTable catalogTable = new ResolvedCatalogTable(origin, resolvedSchema);
