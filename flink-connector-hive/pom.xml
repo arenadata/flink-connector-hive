@@ -1426,5 +1426,11 @@ under the License.
 				<jdk>[11,)</jdk>
 			</activation>
 		</profile>
+		<profile>
+			<id>java17</id>
+			<activation>
+				<jdk>[17,)</jdk>
+			</activation>
+		</profile>
 	</profiles>
 </project>

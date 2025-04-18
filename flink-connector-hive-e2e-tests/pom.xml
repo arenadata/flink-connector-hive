@@ -213,6 +213,7 @@ under the License.
 				<configuration>
 					<skip>${skip.e2e.tests}</skip>
 				</configuration>
+
 				<executions>
 					<execution>
 						<id>default-test</id>
