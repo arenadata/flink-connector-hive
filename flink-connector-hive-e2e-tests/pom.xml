@@ -31,12 +31,7 @@ under the License.
 
 	<properties>
 		<okhttp.version>3.14.9</okhttp.version>
-		<!--
-		Hive requires Hadoop 2 to avoid
-		java.lang.NoClassDefFoundError: org/apache/hadoop/metrics/Updater errors
-		Using this dedicated property avoids CI failures with the Hadoop 3 profile
-		-->
-		<hive.hadoop.version>2.10.2</hive.hadoop.version>
+		<hive.hadoop.version>3.3.6</hive.hadoop.version>
 		<skip.e2e.tests>false</skip.e2e.tests>
 	</properties>
 
@@ -148,8 +143,8 @@ under the License.
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-connector-hive_2.12</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<artifactId>flink-connector-hive</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -41,7 +41,7 @@ under the License.
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-connector-hive_${scala.binary.version}</artifactId>
+			<artifactId>flink-connector-hive</artifactId>
 			<version>${project.version}</version>
 			<optional>${flink.markBundledAsOptional}</optional>
 		</dependency>
@@ -208,7 +208,7 @@ under the License.
 							</filters>
 							<artifactSet>
 								<includes>
-									<include>org.apache.flink:flink-connector-hive_${scala.binary.version}</include>
+									<include>org.apache.flink:flink-connector-hive</include>
 									<include>org.apache.hive:hive-exec</include>
 									<include>org.apache.thrift:libfb303</include>
 									<include>org.antlr:antlr-runtime</include>
