@@ -70,8 +70,8 @@ under the License.
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-connector-hive_${scala.binary.version}</artifactId>
-			<version>${flink.version}</version>
+			<artifactId>flink-connector-hive</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
