@@ -26,6 +26,7 @@ import org.apache.flink.table.catalog.CatalogPropertiesUtil;
 import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.catalog.CatalogView;
 import org.apache.flink.table.catalog.Column;
+import org.apache.flink.table.catalog.Index;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.ResolvedCatalogBaseTable;
 import org.apache.flink.table.catalog.ResolvedCatalogTable;
@@ -36,6 +37,7 @@ import org.apache.flink.table.catalog.hive.HiveCatalogConfig;
 import org.apache.flink.table.catalog.hive.client.HiveMetastoreClientWrapper;
 import org.apache.flink.table.catalog.hive.client.HiveShim;
 import org.apache.flink.table.expressions.CallExpression;
+import org.apache.flink.table.expressions.DefaultSqlFactory;
 import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.expressions.ExpressionVisitor;
 import org.apache.flink.table.expressions.FieldReferenceExpression;
@@ -100,6 +102,9 @@ public class HiveTableUtil {
     private static final byte HIVE_CONSTRAINT_ENABLE = 1 << 2;
     private static final byte HIVE_CONSTRAINT_VALIDATE = 1 << 1;
     private static final byte HIVE_CONSTRAINT_RELY = 1;
+
+    private static final String FLINK_SCHEMA_INDEX_PREFIX =
+            FLINK_PROPERTY_PREFIX + "schema.index.";
 
     private static final StorageFormatFactory storageFormatFactory = new StorageFormatFactory();
 
@@ -523,14 +528,17 @@ public class HiveTableUtil {
                 sd.setCols(allColumns);
             }
             // Table properties
+            putFlinkIndexProperties(hiveTable.getParameters(), table.getResolvedSchema());
             hiveTable.getParameters().putAll(properties);
         } else {
             if (isView) {
                 properties.putAll(
-                        CatalogPropertiesUtil.serializeCatalogView((ResolvedCatalogView) table));
+                        CatalogPropertiesUtil.serializeCatalogView(
+                                (ResolvedCatalogView) table, DefaultSqlFactory.INSTANCE));
             } else {
                 properties.putAll(
-                        CatalogPropertiesUtil.serializeCatalogTable((ResolvedCatalogTable) table));
+                        CatalogPropertiesUtil.serializeCatalogTable(
+                                (ResolvedCatalogTable) table, DefaultSqlFactory.INSTANCE));
             }
 
             properties = maskFlinkProperties(properties);
@@ -557,6 +565,18 @@ public class HiveTableUtil {
         }
 
         return hiveTable;
+    }
+
+    private static void putFlinkIndexProperties(
+            Map<String, String> parameters, ResolvedSchema schema) {
+        List<Index> indexes = schema.getIndexes();
+        for (int i = 0; i < indexes.size(); i++) {
+            Index index = indexes.get(i);
+            parameters.put(FLINK_SCHEMA_INDEX_PREFIX + i + ".name", index.getName());
+            parameters.put(
+                    FLINK_SCHEMA_INDEX_PREFIX + i + ".columns",
+                    String.join(",", index.getColumns()));
+        }
     }
 
     /**

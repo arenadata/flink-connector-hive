@@ -24,6 +24,7 @@ import org.apache.flink.api.java.hadoop.mapred.utils.HadoopUtils;
 import org.apache.flink.connectors.hive.FlinkHiveException;
 import org.apache.flink.connectors.hive.HiveDynamicTableFactory;
 import org.apache.flink.connectors.hive.util.HivePartitionUtils;
+import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.catalog.AbstractCatalog;
 import org.apache.flink.table.catalog.CatalogBaseTable;
 import org.apache.flink.table.catalog.CatalogDatabase;
@@ -746,6 +747,11 @@ public class HiveCatalog extends AbstractCatalog {
         if (isHiveTable) {
             // Table schema
             schema = HiveTableUtil.createSchema(hiveConf, hiveTable, client, hiveShim);
+            Map<String, String> flinkProperties = retrieveFlinkProperties(properties);
+            if (!flinkProperties.isEmpty()) {
+                schema = appendFlinkIndexes(schema, flinkProperties);
+                properties.keySet().removeIf(k -> k.startsWith(FLINK_PROPERTY_PREFIX));
+            }
 
             if (!hiveTable.getPartitionKeys().isEmpty()) {
                 partitionKeys = getFieldNames(hiveTable.getPartitionKeys());
@@ -784,6 +790,21 @@ public class HiveCatalog extends AbstractCatalog {
                     .options(properties)
                     .build();
         }
+    }
+
+    private static Schema appendFlinkIndexes(Schema schema, Map<String, String> flinkProperties) {
+        Schema flinkSchema =
+                CatalogPropertiesUtil.deserializeCatalogTable(flinkProperties)
+                        .getUnresolvedSchema();
+        if (flinkSchema.getIndexes().isEmpty()) {
+            return schema;
+        }
+
+        Schema.Builder builder = Schema.newBuilder().fromSchema(schema);
+        flinkSchema
+                .getIndexes()
+                .forEach(index -> builder.indexNamed(index.getIndexName(), index.getColumnNames()));
+        return builder.build();
     }
 
     /** Filter out Hive-created properties, and return Flink-created properties. */

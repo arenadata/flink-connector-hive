@@ -95,7 +95,6 @@ public class HiveParserSqlCountAggFunction extends SqlAggFunction
                     false,
                     ImmutableIntList.of(),
                     -1,
-                    null,
                     RelCollations.EMPTY,
                     typeFactory.createTypeWithNullability(
                             typeFactory.createSqlType(SqlTypeName.BIGINT), true),
