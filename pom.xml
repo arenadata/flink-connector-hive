@@ -87,7 +87,8 @@ under the License.
     <distributionManagement>
         <repository>
             <id>arenadata</id>
-            <url>https://maven.pkg.github.com/arenadata/flink</url>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/arenadata/flink-connector-hive</url>
         </repository>
     </distributionManagement>
     <dependencyManagement>
