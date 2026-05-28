@@ -55,9 +55,10 @@ under the License.
             Hive 2.3.4 relies on Hadoop 2.7.2 and later versions.
             For Hadoop 2.7, the minor Hadoop version supported for flink-shaded-hadoop-2-uber is 2.7.5
         -->
-        <hadoop.version>3.3.6</hadoop.version>
-        <hive.version>4.0.1</hive.version>
+        <hadoop.version>3.4.3.1-4.3.0-1</hadoop.version>
+        <hive.version>4.3.0.1-4.3.0-1</hive.version>
         <hive.avro.version>1.11.4</hive.avro.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <!-- Keep Janino in sync with calcite. -->
         <janino.version>3.1.10</janino.version>
         <jackson-bom.version>2.15.3</jackson-bom.version>
@@ -74,10 +75,21 @@ under the License.
         <flink.markBundledAsOptional>true</flink.markBundledAsOptional>
 
         <flink.parent.artifactId>flink-connector-hive-parent</flink.parent.artifactId>
-        <source.java.version>17</source.java.version>
-        <target.java.version>17</target.java.version>
+        <source.java.version>21</source.java.version>
+        <target.java.version>21</target.java.version>
     </properties>
-
+    <repositories>
+        <repository>
+            <id>arenadata</id>
+            <url>https://maven.pkg.github.com/arenadata/*</url>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>arenadata</id>
+            <url>https://maven.pkg.github.com/arenadata/flink</url>
+        </repository>
+    </distributionManagement>
     <dependencyManagement>
 
         <dependencies>
@@ -382,7 +394,7 @@ under the License.
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.3.2</version>
+                <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -431,7 +443,18 @@ under the License.
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
-                <inherited>false</inherited>
+                <configuration>
+                    <excludes>
+                        <exclude>.asf.yaml</exclude>
+                        <exclude>.gitmodules</exclude>
+                        <exclude>README.md</exclude>
+                        <exclude>archunit-violations/**</exclude>
+                        <exclude>src/main/resources/META-INF/licenses/LICENSE.*</exclude>
+                        <exclude>src/test/resources/csv/*.csv</exclude>
+                        <exclude>src/test/resources/explain/*.out</exclude>
+                        <exclude>src/test/resources/query-test/*.q</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -497,4 +520,3 @@ under the License.
         </plugins>
     </build>
 </project>
-

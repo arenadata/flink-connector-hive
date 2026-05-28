@@ -29,7 +29,6 @@ import org.apache.flink.types.Row;
 
 import org.apache.hadoop.hive.ql.udf.UDFUnhex;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFAbs;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDFCase;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFCeil;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFCoalesce;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFDateDiff;
@@ -129,9 +128,13 @@ public class HiveGenericUDFTest {
 
     @Test
     public void testCase() {
+        Class<?> genericUDFCaseClass =
+                loadClass("org.apache.hadoop.hive.ql.udf.generic.GenericUDFCase");
+        Assume.assumeTrue(genericUDFCaseClass != null);
+
         HiveGenericUDF udf =
                 init(
-                        GenericUDFCase.class,
+                        genericUDFCaseClass,
                         new Object[] {null, "1", "a", "b"},
                         new DataType[] {
                             DataTypes.STRING(),
@@ -348,5 +351,13 @@ public class HiveGenericUDFTest {
         udf.open(null);
 
         return udf;
+    }
+
+    private static Class<?> loadClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }
