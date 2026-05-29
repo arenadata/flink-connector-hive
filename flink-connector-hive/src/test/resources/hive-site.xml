@@ -46,6 +46,11 @@
 	</property>
 
 	<property>
+		<name>hive.in.test</name>
+		<value>true</value>
+	</property>
+
+	<property>
 		<name>common-key</name>
 		<value>common-val</value>
 	</property>

@@ -26,7 +26,7 @@ under the License.
 	<parent>
 		<groupId>org.apache.flink</groupId>
 		<artifactId>flink-connector-hive-parent</artifactId>
-		<version>3.0.0</version>
+		<version>3.1.0.1-4.3.0-0</version>
 	</parent>
 
 	<artifactId>flink-connector-hive</artifactId>
@@ -35,8 +35,8 @@ under the License.
 	<packaging>jar</packaging>
 
 	<properties>
-		<derby.version>10.10.2.0</derby.version>
-		<hive.hadoop.version>3.3.6</hive.hadoop.version>
+		<derby.version>10.17.1.0</derby.version>
+		<hive.hadoop.version>${hadoop.version}</hive.hadoop.version>
 		<hiverunner.version>4.0.0</hiverunner.version>
 		<reflections.version>0.9.8</reflections.version>
 	</properties>
@@ -1314,6 +1314,12 @@ under the License.
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
+			<version>${derby.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbyshared</artifactId>
 			<version>${derby.version}</version>
 			<scope>test</scope>
 		</dependency>

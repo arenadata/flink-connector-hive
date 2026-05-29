@@ -15,25 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: CI
+name: Publish
 
 on:
+  workflow_dispatch:
   push:
-  pull_request:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    tags:
+      - "*"
 
 permissions:
   contents: read
-  packages: read
+  packages: write
 
 env:
   MAVEN_ARGS: -B -V -e -ntp
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-24.04
 
     steps:
@@ -55,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn ${{ env.MAVEN_ARGS }} -DskipTests apache-rat:check
 
-      - name: Build and test
+      - name: Maven deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn ${{ env.MAVEN_ARGS }} clean test
+        run: mvn ${{ env.MAVEN_ARGS }} clean deploy -DskipTests

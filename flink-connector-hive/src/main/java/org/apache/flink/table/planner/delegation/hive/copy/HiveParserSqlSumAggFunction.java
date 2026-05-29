@@ -110,7 +110,6 @@ public class HiveParserSqlSumAggFunction extends SqlAggFunction
                     false,
                     ImmutableIntList.of(),
                     -1,
-                    null,
                     RelCollations.EMPTY,
                     countRetType,
                     "count");
@@ -159,7 +158,6 @@ public class HiveParserSqlSumAggFunction extends SqlAggFunction
                     false,
                     Collections.singletonList(ordinal),
                     -1,
-                    null,
                     RelCollations.EMPTY,
                     aggregateCall.type,
                     aggregateCall.name);

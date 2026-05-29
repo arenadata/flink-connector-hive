@@ -71,7 +71,9 @@ public class HiveModuleTest {
     }
 
     private void verifyNumBuiltInFunctions(String hiveVersion, HiveModule hiveModule) {
-        if (HiveVersionTestUtil.HIVE_400_OR_LATER) {
+        if (hiveVersion.startsWith(HiveShimLoader.HIVE_VERSION_V4_3_0)) {
+            assertThat(hiveModule.listFunctions()).hasSize(489);
+        } else if (HiveVersionTestUtil.HIVE_400_OR_LATER) {
             assertThat(hiveModule.listFunctions()).hasSize(482);
         } else if (HiveVersionTestUtil.HIVE_310_OR_LATER) {
             assertThat(hiveModule.listFunctions()).hasSize(297);
