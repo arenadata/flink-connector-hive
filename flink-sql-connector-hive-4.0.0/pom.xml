@@ -49,7 +49,8 @@ under the License.
 		<dependency>
 			<groupId>org.apache.hive</groupId>
 			<artifactId>hive-exec</artifactId>
-			<version>4.0.1</version>
+			<version>${hive.version}</version>
+			<scope>provided</scope>
 			<optional>${flink.markBundledAsOptional}</optional>
 			<exclusions>
 				<exclusion>
@@ -91,7 +92,7 @@ under the License.
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-mapreduce-client-core</artifactId>
-			<version>3.3.6</version>
+			<version>${hadoop.version}</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -183,13 +184,9 @@ under the License.
 						<configuration>
 							<filters>
 								<filter>
-									<artifact>org.apache.hive:hive-exec</artifact>
+									<artifact>org.apache.flink:flink-connector-hive</artifact>
 									<excludes>
-										<exclude>avro/shaded/com/google/**</exclude>
-										<exclude>org/apache/avro/**</exclude>
-										<exclude>META-INF/maven/org.apache.avro/**</exclude>
-										<exclude>org/apache/hadoop/hive/conf/HiveConf.class</exclude>
-										<exclude>org/apache/hadoop/hive/metastore/HiveMetaStoreClient.class</exclude>
+										<exclude>org/apache/hadoop/hive/common/classification/**</exclude>
 									</excludes>
 								</filter>
 								<filter>
@@ -209,7 +206,6 @@ under the License.
 							<artifactSet>
 								<includes>
 									<include>org.apache.flink:flink-connector-hive</include>
-									<include>org.apache.hive:hive-exec</include>
 									<include>org.apache.thrift:libfb303</include>
 									<include>org.antlr:antlr-runtime</include>
 									<include>org.apache.avro:avro</include>

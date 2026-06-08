@@ -31,7 +31,6 @@ under the License.
 
 	<properties>
 		<okhttp.version>3.14.9</okhttp.version>
-		<hive.hadoop.version>3.3.6</hive.hadoop.version>
 		<skip.e2e.tests>false</skip.e2e.tests>
 	</properties>
 
@@ -82,6 +81,30 @@ under the License.
 			<artifactId>flink-sql-connector-hive-4.0.0</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-exec</artifactId>
+			<version>${hive.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.reload4j</groupId>
+					<artifactId>reload4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-reload4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<!-- hadoop dependencies for end-to-end test -->
 		<dependency>
@@ -117,7 +140,7 @@ under the License.
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-mapreduce-client-core</artifactId>
-			<version>${hive.hadoop.version}</version>
+			<version>${hadoop.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>
